@@ -1,0 +1,5 @@
+mapwidth: 30
+mapheight: 15
+tilewidth: 32
+tileheight: 32
+blocktype: rectangle
