@@ -1,41 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="15" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="22">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="15" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="41">
  <editorsettings>
   <export target="polygon.lua" format="lua"/>
  </editorsettings>
  <objectgroup id="2" name="objects">
-  <object id="7" x="0" y="384">
-   <polygon points="0,0 960,0 960,96 0,96"/>
+  <object id="24" x="512" y="96">
+   <polygon points="0,0 -32,32 -160,32 -192,0"/>
   </object>
-  <object id="12" x="224" y="192">
-   <polygon points="0,0 0,192 32,192 32,0"/>
+  <object id="25" x="32" y="64">
+   <polygon points="0,0 192,0 160,32 32,32"/>
   </object>
-  <object id="13" x="480" y="384">
-   <polygon points="0,0 64,-64 64,0"/>
+  <object id="27" x="768" y="224">
+   <polygon points="0,0 64,0 64,64 0,64"/>
   </object>
-  <object id="14" x="544" y="320">
-   <polygon points="0,0 416,0 416,64 0,64"/>
+  <object id="28" x="0" y="352">
+   <polygon points="0,0 64,0 64,128 0,128"/>
   </object>
-  <object id="15" x="672" y="288">
-   <polygon points="0,0 -32,32 0,32"/>
+  <object id="29" x="64" y="416">
+   <polygon points="0,0 192,0 192,32 0,32"/>
   </object>
-  <object id="16" x="160" y="160">
-   <polygon points="0,0 32,32 32,0"/>
+  <object id="30" x="256" y="416">
+   <polygon points="0,0 96,-96 224,-96 224,64 0,64"/>
   </object>
-  <object id="17" x="192" y="160">
-   <polygon points="0,0 96,0 96,32 0,32"/>
+  <object id="31" x="928" y="448">
+   <polygon points="0,0 32,-32 32,0"/>
   </object>
-  <object id="18" x="288" y="160">
-   <polygon points="0,0 32,0 0,32"/>
+  <object id="32" x="480" y="448">
+   <polygon points="0,0 480,0 480,32 0,32"/>
   </object>
-  <object id="19" x="512" y="96">
-   <polygon points="0,0 32,32 32,0"/>
+  <object id="37" x="736" y="96">
+   <polygon points="0,0 96,0 96,-32 0,-32"/>
   </object>
-  <object id="20" x="544" y="96">
-   <polygon points="0,0 32,0 0,-32"/>
+  <object id="38" x="800" y="32">
+   <polygon points="0,0 32,0 32,32 0,32"/>
   </object>
-  <object id="21" x="0" y="0">
-   <polygon points="0,0 96,32 0,32"/>
+  <object id="39" x="576" y="96">
+   <polygon points="0,0 64,0 64,96 0,96"/>
+  </object>
+  <object id="40" x="576" y="288">
+   <polygon points="0,0 64,0 64,160 0,160"/>
   </object>
  </objectgroup>
 </map>

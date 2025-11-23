@@ -9,16 +9,30 @@ function love.load()
     cam = camera()
 
     player = {
-        x = 100,
-        y = 100
+        x = 64,
+        y = -64,
+        vx = 0,
+        vy = 0
     }
 
     world = wf.newWorld(0, 1000)
 
-    player.collider = world:newRectangleCollider(player.x, player.y, 32, 32)
+    player.collider = world:newRectangleCollider(player.x, player.y, 30, 30)
     player.collider:setPosition(100, 100)
     player.collider:setFixedRotation(false)
     player.collider:setRestitution(0)
+
+    player.collider:setPosition(player.x, player.y)
+
+    function player:reset()
+        self.x = 64
+        self.y = -64
+        self.vx = 0
+        self.vy = 0
+        self.collider:setX(self.x)
+        self.collider:setY(self.y)
+        self.collider:setLinearVelocity(self.vx, self.vy)
+    end
 
     walls = {}
 
@@ -38,18 +52,6 @@ function love.load()
             table.insert(walls, col)
         end
     end
-
-    -- Polygon demo
-    --[[
-    ground = world:newPolygonCollider({0+0, 0+384, 960+0, 0+384, 960+0, 96+384, 0+0, 96+384})
-    ground:setType("static")
-
-    slope = world:newPolygonCollider({480, 384, 480+64, 384-64, 64+480, 384})
-    slope:setType("static")
-    --]]
-
-
-
 end
 
 function love.keypressed(key)
@@ -65,13 +67,8 @@ end
 
 function love.update(dt)
     pre_x, pre_y = player.x, player.y
-    if player.y > 2000 then player.y = 100
-    player.x = 100
-    player.vx = 0
-    player.vy = 0
-    player.collider:setX(player.x)
-    player.collider:setY(player.y)
-    player.collider:setLinearVelocity(player.vx, player.vy)
+    if player.y > 2000 then
+        player:reset()
     end
 
     if love.keyboard.isDown("left", "a") then
@@ -85,11 +82,11 @@ function love.update(dt)
     world:update(dt)
 
     local vx, vy = player.collider:getLinearVelocity()
-    if vx > 300 then
-        vx = 300
+    if vx > 200 then
+        vx = 200
     end
-    if vx < -300 then
-        vx = -300
+    if vx < -200 then
+        vx = -200
     end
     if vy > 600 then
         vy = 600
