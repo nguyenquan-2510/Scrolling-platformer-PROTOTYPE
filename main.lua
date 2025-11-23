@@ -34,29 +34,45 @@ function love.load()
         self.collider:setLinearVelocity(self.vx, self.vy)
     end
 
+    function player:isGrounded()
+        self.query = world:queryLine(self.x, self.y, self.x, self.y + math.ceil(32 * math.sqrt(2)))
+        return #self.query > 0
+    end
+
     walls = {}
 
-    ---[[
-    polygon = sti("polygon.lua")
+    map = {
+        [1] = sti("polygon.lua"),
+        [2] = sti("ploygon2.lua")
+    }
 
-    if polygon.layers["objects"] then
-        for i, obj in pairs(polygon.layers["objects"].objects) do
-            local coords = {}
-            for _, xy in ipairs(obj.polygon) do
-                table.insert(coords, xy.x)
-                table.insert(coords, xy.y)
+    draw_map = {true, true}
+    map_offset_x = 0
+    for i, platform in ipairs(map) do
+        if draw_map[i] then
+            if platform.layers["objects"] then
+                for _, obj in pairs(platform.layers["objects"].objects) do
+                    local coords = {}
+                    for _, xy in ipairs(obj.polygon) do
+                        table.insert(coords, xy.x + map_offset_x)
+                        table.insert(coords, xy.y)
+                    end
+
+                    local col = world:newPolygonCollider(coords)
+                    col:setType("static")
+                    table.insert(walls, col)
+                end
+            else
+                print(string.format("Map no.%d does not have any objects ! Skipping"), i)
             end
-            local col = world:newPolygonCollider(coords)
-            col:setType("static")
-
-            table.insert(walls, col)
+            map_offset_x = map_offset_x + 32*30
         end
     end
 end
 
 function love.keypressed(key)
     local vx, vy = player.collider:getLinearVelocity()
-    if (key == "up" or key == "w" ) and math.abs(vy) < 1 then
+    if (key == "up" or key == "w" ) and player:isGrounded() then
         player.collider:applyLinearImpulse(0, -1200)
     end
 
@@ -100,22 +116,10 @@ function love.update(dt)
     player.y = player.collider:getY()
     cam:lookAt(player.x, player.y)
 
-
-    if pre_x ~= player.x or pre_y ~= player.y then
-        -- print(string.format([[
-        -- ----------------------------------------------------
-        -- Player X: %.2f | Player Y: %.2f
-        -- Player vX: %.2f | Player vY: %.2f
-        -- ----------------------------------------------------
-        -- ]], player.x, player.y, vx, vy))
-    end
 end
 
 function love.draw()
     cam:attach()
     world:draw()
     cam:detach()
-
-    -- love.graphics.rectangle("fill", screenW/2, screenH/2, 32, 32)
-
 end
