@@ -1,4 +1,6 @@
 function love.load()
+    math.randomseed(os.time())
+
     screenW = love.graphics.getWidth()
     screenH = love.graphics.getHeight()
 
@@ -24,7 +26,7 @@ function love.load()
 
     player.collider:setPosition(player.x, player.y)
 
-    function player:reset()
+    function player:reset(current_map)
         self.x = 64
         self.y = -64
         self.vx = 0
@@ -32,59 +34,46 @@ function love.load()
         self.collider:setX(self.x)
         self.collider:setY(self.y)
         self.collider:setLinearVelocity(self.vx, self.vy)
+        draw_map[current_map] = false
+        walls[current_map] = nil
     end
 
     function player:isGrounded()
-        self.query = world:queryLine(self.x, self.y, self.x, self.y + math.ceil(32 * math.sqrt(2)))
+        self.query = world:queryLine(self.x, self.y, self.x, self.y + 5 + math.ceil(32 * math.sqrt(2)))
         return #self.query > 0
     end
 
     walls = {}
 
-    map = {
+    maps = {
         [1] = sti("polygon.lua"),
         [2] = sti("ploygon2.lua")
     }
 
-    draw_map = {true, true}
-    map_offset_x = 0
-    for i, platform in ipairs(map) do
-        if draw_map[i] then
-            if platform.layers["objects"] then
-                for _, obj in pairs(platform.layers["objects"].objects) do
-                    local coords = {}
-                    for _, xy in ipairs(obj.polygon) do
-                        table.insert(coords, xy.x + map_offset_x)
-                        table.insert(coords, xy.y)
-                    end
+    map = {}
+    draw_map = {}
 
-                    local col = world:newPolygonCollider(coords)
-                    col:setType("static")
-                    table.insert(walls, col)
-                end
-            else
-                print(string.format("Map no.%d does not have any objects ! Skipping"), i)
-            end
-            map_offset_x = map_offset_x + 32*30
-        end
-    end
-end
 
-function love.keypressed(key)
-    local vx, vy = player.collider:getLinearVelocity()
-    if (key == "up" or key == "w" ) and player:isGrounded() then
-        player.collider:applyLinearImpulse(0, -1200)
-    end
+    temp_walls = {}
 
-    if key == "escape" then
-        love.event.quit()
-    end
+    util = require 'draw_platform'
 end
 
 function love.update(dt)
-    pre_x, pre_y = player.x, player.y
+
+    current_map = math.ceil((player.x)/ 960)
+    previous_map = current_map - 1
+    previous_right_boundary = 960 * (previous_map)
+
+    if not map[current_map] or not draw_map[current_map] then
+        map[current_map] = maps[math.random(1, 2)]
+        draw_map[current_map] = true
+        util.draw_platform(map, draw_map, walls)
+    end
+
+    pre_x = player.x
     if player.y > 2000 then
-        player:reset()
+        player:reset(current_map)
     end
 
     if love.keyboard.isDown("left", "a") then
@@ -116,6 +105,32 @@ function love.update(dt)
     player.y = player.collider:getY()
     cam:lookAt(player.x, player.y)
 
+    if pre_x ~= player.x then
+        print(string.format([[
+        X: %.2f
+        Current map: %d
+        Map existence: %s
+        Has been drawn:  %s
+        ]],
+        player.x,
+        current_map,
+        tostring(map[current_map] ~= nil),
+        tostring(draw_map[current_map])))
+    end
+
+end
+
+function love.keypressed(key)
+    if (key == "up" or key == "w" ) and player:isGrounded() then
+        player.collider:applyLinearImpulse(0, -1200)
+    end
+
+    if key == "escape" then
+        love.event.quit()
+    end
+    if key == "x" then
+        print(walls[1], walls[2])
+    end
 end
 
 function love.draw()
