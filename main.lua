@@ -1,3 +1,39 @@
+MAP_WIDTH = 960
+map_templates = {"polygon.lua", "ploygon2.lua"}
+-- remember which template was used per logical map index so we can
+-- regenerate the same map when the player returns
+map_template_for_idx = {}
+
+function remove_map(idx)
+    if not idx then return end
+    if walls and walls[idx] then
+        for _, col in ipairs(walls[idx]) do
+            if col and col.destroy then
+                col:destroy()
+            end
+        end
+        walls[idx] = nil
+    end
+    if draw_map and draw_map[idx] then draw_map[idx] = nil end
+    if map and map[idx] then map[idx] = nil end
+    -- NOTE: we intentionally do NOT clear map_template_for_idx[idx]
+    -- so when the player returns the same template will be reloaded.
+end
+
+function spawn_map(idx)
+    if not idx then return end
+    if map and map[idx] then return end
+    local tpl = map_template_for_idx[idx]
+    if not tpl then
+        tpl = map_templates[math.random(1, #map_templates)]
+        map_template_for_idx[idx] = tpl
+    end
+    map[idx] = sti(tpl)
+    draw_map[idx] = true
+    -- draw only this map with the correct offset
+    util.draw_platform({[idx]=map[idx]}, {[idx]=true}, walls, (idx - 1) * MAP_WIDTH)
+end
+
 function love.load()
     math.randomseed(os.time())
 
@@ -34,8 +70,8 @@ function love.load()
         self.collider:setX(self.x)
         self.collider:setY(self.y)
         self.collider:setLinearVelocity(self.vx, self.vy)
-        draw_map[current_map] = false
-        walls[current_map] = nil
+        -- remove the current map so it will regenerate fresh
+        remove_map(current_map)
     end
 
     function player:isGrounded()
@@ -44,31 +80,32 @@ function love.load()
     end
 
     walls = {}
-
-    maps = {
-        [1] = sti("polygon.lua"),
-        [2] = sti("ploygon2.lua")
-    }
-
     map = {}
     draw_map = {}
-
 
     temp_walls = {}
 
     util = require 'draw_platform'
+
+    -- spawn initial nearby maps (1 and 2)
+    spawn_map(1)
+    spawn_map(2)
 end
 
 function love.update(dt)
 
-    current_map = math.ceil((player.x)/ 960)
-    previous_map = current_map - 1
-    previous_right_boundary = 960 * (previous_map)
+    current_map = math.ceil((player.x) / MAP_WIDTH)
 
-    if not map[current_map] or not draw_map[current_map] then
-        map[current_map] = maps[math.random(1, 2)]
-        draw_map[current_map] = true
-        util.draw_platform(map, draw_map, walls)
+    -- ensure current and neighbouring maps exist
+    spawn_map(current_map - 1)
+    spawn_map(current_map)
+    spawn_map(current_map + 1)
+
+    -- remove maps that are too far away (keep a window of prev,current,next)
+    for k, _ in pairs(map) do
+        if k < (current_map - 1) or k > (current_map + 1) then
+            remove_map(k)
+        end
     end
 
     pre_x = player.x

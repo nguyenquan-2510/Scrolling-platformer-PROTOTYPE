@@ -6,7 +6,7 @@ function m.draw_platform(map_list, bool_draw_list, collider_storage, offset_x)
         if collider_storage[i] == nil then
             collider_storage[i] = {}
         end
-        
+
         if bool_draw_list[i] then
             if platform.layers["objects"] then
                 for _, obj in pairs(platform.layers["objects"].objects) do
